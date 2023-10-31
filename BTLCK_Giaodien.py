@@ -81,10 +81,6 @@ textbox_Smokingstatus.grid(row=6, column=5)
 
 
 
-
-
-
-
 def error(y,y_pred):
     sum=0
     for i in range(0,len(y)):
@@ -152,6 +148,7 @@ lbl_perceptron = Label(form)
 lbl_perceptron.grid(column=2, row=9)
 lbl_perceptron.configure(text="Các độ đo của Perceptron: " + '\n'
                     + "Tỷ lệ dự đoán đúng: " + str(accuracy_score(y_test_perceptron_codetay,y_pre_perceptron_codetay)) + '\n'
+                    + "Tỷ lệ dự đoán sai: " + str(1-accuracy_score(y_test_perceptron_codetay,y_pre_perceptron_codetay)) + '\n'
                     + "Precision: " + str(precision_score(y_test_perceptron_codetay,y_pre_perceptron_codetay)) + '\n'
                     + "Recall: " + str(recall_score(y_test_perceptron_codetay,y_pre_perceptron_codetay)) + '\n'
                     + "f1_score: " + str(f1_score(y_test_perceptron_codetay,y_pre_perceptron_codetay)) + '\n',
@@ -208,6 +205,7 @@ lbl_svm = Label(form)
 lbl_svm.grid(column=5, row=9)
 lbl_svm.configure(text="Các độ đo của SVM: " + '\n'
                     + "Tỷ lệ dự đoán đúng: " + str(accuracy_score(y_test,y_pre_svm)) + '\n'
+                    + "Tỷ lệ dự đoán sai: " + str(1 - accuracy_score(y_test,y_pre_svm)) + '\n'
                     + "Precision: " + str(precision_score(y_test,y_pre_svm)) + '\n'
                     + "Recall: " + str(recall_score(y_pre_svm,y_test)) + '\n'
                     + "f1_score: " + str(f1_score(y_test,y_pre_svm)) + '\n',
