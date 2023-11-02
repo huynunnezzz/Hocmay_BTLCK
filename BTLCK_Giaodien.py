@@ -1,11 +1,10 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
+import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
-import numpy as np
-from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Perceptron
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
@@ -80,13 +79,11 @@ textbox_Smokingstatus = Entry(form)
 textbox_Smokingstatus.grid(row=6, column=5)
 
 
-
 def error(y,y_pred):
     sum=0
     for i in range(0,len(y)):
         sum = sum + abs(y[i] - y_pred[i])
     return sum/len(y)  # tra ve trung binh
-
 
 def check( X_train, W):
     return np.sign(np.dot(W.T,X_train))
@@ -99,7 +96,7 @@ def Stop( W,X_train,y_train,max_count):
             if( y_pre==-1):
                 y_pre=0
             if ( y_pre != y_train[i]):
-                W = (W + check(X_train[i].T,W)*X_train[i])
+                W = W + check(X_train[i].T,W)*X_train[i]
                 count += 1
     return W
 
@@ -123,7 +120,6 @@ def Kfold_perceptron_tay():
         for i in range(len(y_train_pre)):
             if(y_train_pre[i] == -1):
                 y_train_pre = 0
-
         y_validation_pre = check(x_validation.T,W)
         for i in range(len(y_validation_pre)):
             if(y_validation_pre[i] == -1):
@@ -156,20 +152,20 @@ lbl_perceptron.configure(text="Các độ đo của Perceptron: " + '\n'
 
 
 def Dudoan_perceptron():
-    Gender = float(textbox_Gender.get())
-    Age = float(textbox_Age.get())
-    Hypertension = float(textbox_Hypertension.get())
-    Heartdisease = float(textbox_Heartdisease.get())
-    Evermarried = float(textbox_Evermarried.get())
-    Worktype = float(textbox_Worktype.get())
-    Residencetype = float(textbox_Residencetype.get())
-    Avgglucoselevel = float(textbox_Avgglucoselevel.get())
-    Bmi = float(textbox_Bmi.get())
-    Smokingstatus = float(textbox_Smokingstatus.get())
+    Gender = textbox_Gender.get()
+    Age = textbox_Age.get()
+    Hypertension = textbox_Hypertension.get()
+    Heartdisease = textbox_Heartdisease.get()
+    Evermarried = textbox_Evermarried.get()
+    Worktype = textbox_Worktype.get()
+    Residencetype = textbox_Residencetype.get()
+    Avgglucoselevel = textbox_Avgglucoselevel.get()
+    Bmi = textbox_Bmi.get()
+    Smokingstatus = textbox_Smokingstatus.get()
     if ((Gender == '') or (Age == '') or (Hypertension == '') or (Heartdisease == '') or (Evermarried == '') or (Worktype == '') or (Residencetype == '')  or (Avgglucoselevel == '') or (Bmi == '') or (Smokingstatus == '')):
         messagebox.showinfo("Thông báo", "Bạn cần nhập đầy đủ thông tin!")
     else:
-        X_dudoan = np.array([1,Gender,Age,Hypertension,Heartdisease,Evermarried,Worktype,Residencetype,Avgglucoselevel,Bmi,Smokingstatus])
+        X_dudoan = np.array([1,float(Gender),float(Age),float(Hypertension),float(Heartdisease),float(Evermarried),float(Worktype),float(Residencetype),float(Avgglucoselevel),float(Bmi),float(Smokingstatus)])
         y_dudoan_perceptron = check(X_dudoan.T,W_find)
         lbl_perceptron_dudoan.configure(text=y_dudoan_perceptron)
 
@@ -183,12 +179,12 @@ lbl_perceptron_dudoan.grid( row=12,column=3)
 
 X_test = np.array(dt_Test.iloc[:,:-1])
 y_test = np.array(dt_Test.iloc[:,-1])
-# #KFold+SVM
+#KFold+SVM
 def Kfold_SVM(min):
     for train_index, validation_index in kf.split(dt_Train):
         X_train, X_validation = dt_Train.iloc[train_index, :-1].values, dt_Train.iloc[validation_index, :-1].values
         y_train, y_validation = dt_Train.iloc[train_index, -1], dt_Train.iloc[validation_index, -1]
-        svm = SVC()
+        svm = SVC(kernel='rbf',max_iter=-1)
         svm.fit(X_train, y_train)
         y_train_pred = svm.predict(X_train)
         y_validation_pred = svm.predict(X_validation)
@@ -235,5 +231,6 @@ lbl_svm_dudoan = Label(form, text="Dữ liệu trên thuộc lớp: ")
 lbl_svm_dudoan.grid( row=12,column=5)
 lbl_svm_dudoan = Label(form, text="...")
 lbl_svm_dudoan.grid( row=12,column=6)
+
 
 form.mainloop()
