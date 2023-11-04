@@ -11,13 +11,10 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
-from sklearn import preprocessing
 
 
 # Loading the dataset
-data = pd.read_csv('./healthcare-dataset-stroke-data.csv')
-le = preprocessing.LabelEncoder()
-data = data.apply(le.fit_transform)
+data = pd.read_csv('healthcare-dataset-stroke-data1.csv')
 dt_Train, dt_Test = train_test_split(data, test_size=0.3 , shuffle = True)
 
 
@@ -117,13 +114,7 @@ def Kfold_perceptron_tay():
 
         W = Stop(W,x_train,y_train,2000)
         y_train_pre = check(x_train.T,W)
-        for i in range(len(y_train_pre)):
-            if(y_train_pre[i] == -1):
-                y_train_pre = 0
         y_validation_pre = check(x_validation.T,W)
-        for i in range(len(y_validation_pre)):
-            if(y_validation_pre[i] == -1):
-                y_validation_pre = 0
 
         sum_error = error(y_train, y_train_pre) + error(y_validation, y_validation_pre)
         if (sum_error < min):
@@ -140,15 +131,44 @@ for i in range(0,len(X_test_perceptron_codetay)):
         y_pre_perceptron_codetay.append(check(X_test_perceptron_codetay[i].T,W_find))
         if ( y_pre_perceptron_codetay==-1):
              y_pre_perceptron_codetay=0
+
+print("Độ đo Perceptron code tay: ")
+print('Ty le du doan dung Kfold+Perceptron: ', accuracy_score(y_test_perceptron_codetay, y_pre_perceptron_codetay))
+print('Precision Kfold+Perceptron: ', precision_score(y_test_perceptron_codetay, y_pre_perceptron_codetay))
+print('Recall Kfold+Perceptron: ', recall_score(y_pre_perceptron_codetay, y_test_perceptron_codetay))
+print('f1_score Kfold+Perceptron: ', f1_score(y_test_perceptron_codetay, y_pre_perceptron_codetay))
+
+
+
+X_test = np.array(dt_Test.iloc[:,:-1])
+y_test = np.array(dt_Test.iloc[:,-1])
+
+def Kfold_perceptron(min):
+    for train_index, validation_index in kf.split(dt_Train):
+        x_train, X_validation = dt_Train.iloc[train_index, :-1].values, dt_Train.iloc[validation_index, :-1].values
+        y_train, y_validation = dt_Train.iloc[train_index, -1], dt_Train.iloc[validation_index, -1]
+        per = Perceptron(penalty='l2',max_iter=600)
+        per.fit(x_train, y_train)
+        y_train_pred = per.predict(x_train)
+        y_validation_pred = per.predict(X_validation)
+        y_train = np.array(y_train)
+        y_validation = np.array(y_validation)
+        sum_error = error(y_train, y_train_pred) + error(y_validation, y_validation_pred)
+        if (sum_error < min):
+            min = sum_error
+            per_find = per
+        return per_find
+
+y_pre_per = Kfold_perceptron(99999999).predict(X_test)
 lbl_perceptron = Label(form)
 lbl_perceptron.grid(column=2, row=9)
 lbl_perceptron.configure(text="Các độ đo của Perceptron: " + '\n'
-                    + "Tỷ lệ dự đoán đúng: " + str(accuracy_score(y_test_perceptron_codetay,y_pre_perceptron_codetay)) + '\n'
-                    + "Tỷ lệ dự đoán sai: " + str(1-accuracy_score(y_test_perceptron_codetay,y_pre_perceptron_codetay)) + '\n'
-                    + "Precision: " + str(precision_score(y_test_perceptron_codetay,y_pre_perceptron_codetay)) + '\n'
-                    + "Recall: " + str(recall_score(y_test_perceptron_codetay,y_pre_perceptron_codetay)) + '\n'
-                    + "f1_score: " + str(f1_score(y_test_perceptron_codetay,y_pre_perceptron_codetay)) + '\n',
-               font=("Arial Bold", 10), fg="red")
+                              + "Tỷ lệ dự đoán đúng: " + str(accuracy_score(y_test, y_pre_per)) + '\n'
+                              + "Tỷ lệ dự đoán sai: " + str(1 - accuracy_score(y_test, y_pre_per)) + '\n'
+                              + "Precision: " + str(precision_score(y_test, y_pre_per)) + '\n'
+                              + "Recall: " + str(recall_score(y_test, y_pre_per)) + '\n'
+                              + "f1_score: " + str(f1_score(y_test, y_pre_per)) + '\n',
+                         font=("Arial Bold", 10), fg="red")
 
 
 def Dudoan_perceptron():
@@ -176,9 +196,7 @@ lbl_perceptron_dudoan.grid(row=12,column=2)
 lbl_perceptron_dudoan = Label(form, text="..." +'\n')
 lbl_perceptron_dudoan.grid( row=12,column=3)
 
-
-X_test = np.array(dt_Test.iloc[:,:-1])
-y_test = np.array(dt_Test.iloc[:,-1])
+#kernel{‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’} or callable, default=’rbf’}
 #KFold+SVM
 def Kfold_SVM(min):
     for train_index, validation_index in kf.split(dt_Train):
